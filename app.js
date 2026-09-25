@@ -59,10 +59,8 @@ function quitarComponenteHardware(idx) {
   renderizarChipsHardware();
 }
 
-// Devuelve los pines registrados para un tipo dado
 // Devuelve los pines registrados para un tipo dado, con filtro estricto para PWM
 function obtenerOpcionesHardware(tipo) {
-  // Pines PWM válidos en Arduino Uno / Nano
   const pinesPWM = ["3", "5", "6", "9", "10", "11"];
 
   if (tipo === "led-pwm") {
@@ -79,7 +77,7 @@ function obtenerOpcionesHardware(tipo) {
   return filtrados.map((c) => `Pin ${c.pin}`);
 }
 
-// Si los chicos agregan un LED nuevo, se actualizan los desplegables ya puestos en el tablero
+// Si los chicos agregan o quitan componentes, se actualizan los desplegables del tablero
 function actualizarTodosLosSelectsDinamicos() {
   document.querySelectorAll(".select-dinamico").forEach((sel) => {
     const fuente = sel.getAttribute("data-fuente");
@@ -102,6 +100,8 @@ function actualizarTodosLosSelectsDinamicos() {
 function construirHerramientas(lado, idContenedor, idTablero) {
   const contenedor = document.getElementById(idContenedor);
   contenedor.innerHTML = "";
+
+  if (!SISTEMA[lado]) return;
 
   SISTEMA[lado].forEach((cat) => {
     const divCat = document.createElement("div");
@@ -265,28 +265,42 @@ function configurarArrastre(el, tablero) {
 }
 
 // =========================================================================
-// EXPORTADOR BLINDADO CON MAPA DE HARDWARE
+// EXPORTADOR BLINDADO CON MAPA DE HARDWARE, COM Y HUSKYLENS V2
 // =========================================================================
 function exportarLogica() {
+  const puertoComElegido = document.getElementById("sel-puerto-com")
+    ? document.getElementById("sel-puerto-com").value
+    : "COM7";
+
+  const modeloHuskyElegido = document.getElementById("sel-modelo-husky")
+    ? document.getElementById("sel-modelo-husky").value
+    : "ALGORITHM_SELF_LEARNING_CLASSIFICATION";
+
   let prompt =
     "ERES UN COMPILADOR ESTRICTO DE ROBÓTICA EDUCATIVA PARA ARDUINO Y NOTEBOOK (PYGAME).\n";
   prompt +=
-    "Tu tarea es traducir la siguiente secuencia a código funcional, limpio y 100% libre de errores.\n\n";
+    "Tu tarea es traducir la siguiente secuencia a código funcional, limpio y 100% libre de errores de compilación.\n\n";
 
   prompt += "=== MAPA DE COMPONENTES DECLARADOS POR LOS ALUMNOS ===\n";
   componentesConectados.forEach((c) => {
     prompt += `• ${c.etiqueta}\n`;
   });
   prompt +=
-    "• HuskyLens 2 y Panel LCD 16x2 van fijos al bus I2C (Pines A4 SDA y A5 SCL). Dirección LCD: 0x27.\n\n";
+    "• HuskyLens 2 va fija al bus I2C (Pines A4 SDA y A5 SCL). NO incluir librerías de LCD salvo que esté explícitamente en los componentes.\n\n";
 
-  prompt += "REGLAS TÉCNICAS OBLIGATORIAS:\n";
+  prompt += "=== REGLAS TÉCNICAS OBLIGATORIAS (CONTRATO DE COMPILACIÓN) ===\n";
   prompt +=
-    "1. Declara cada componente usando constantes (#define o const int) respetando los pines exactos declarados arriba.\n";
+    "1. Declarar componentes con constantes (const int) respetando los pines exactos declarados arriba.\n";
+  prompt += "2. En Arduino para HuskyLens 2 usar OBLIGATORIAMENTE:\n";
+  prompt += "   - #include <Wire.h>\n";
+  prompt += '   - #include "DFRobot_HuskylensV2.h"\n';
+  prompt += "   - Instancia: HuskylensV2 huskylens;\n";
+  prompt += `   - Algoritmo seleccionado: huskylens.switchAlgorithm(${modeloHuskyElegido});\n`;
+  prompt += "   - Espera obligatoria tras switchAlgorithm: delay(1000);\n";
+  prompt += `   - Lectura: huskylens.getResult(${modeloHuskyElegido}) y popCachedResult(${modeloHuskyElegido}) casteado a Result*.\n`;
   prompt +=
-    "2. En Arduino: usa <Wire.h>, 'HUSKYLENS.h', <LiquidCrystal_I2C.h>, 'DHT.h' según corresponda.\n";
-  prompt +=
-    "3. En Python: usa Pygame a pantalla completa fondo negro (0,0,0) para efecto holograma OLED, salir con tecla ESC, y PySerial a 9600 baudios con timeout corto.\n\n";
+    "3. Potenciómetros: rango calibrado de entrada en 0 a 253 -> usar constrain(analogRead(pin), 0, 253) y map(..., 0, 253, 0, 255).\n";
+  prompt += `4. En Python: usar Pygame a pantalla completa fondo negro (0,0,0) para efecto holograma OLED, salir con tecla ESC, y PySerial a 9600 baudios en el puerto '${puertoComElegido}'.\n\n`;
 
   prompt += "=== RESUMEN DEL ALGORITMO ===\n\n";
 
@@ -339,7 +353,7 @@ function exportarLogica() {
     .writeText(prompt)
     .then(() => {
       alert(
-        "¡Prompt, mapa de hardware y lógica copiados con éxito! Pega esto en el chat.",
+        `¡Prompt copiado con éxito!\nPuerto: ${puertoComElegido}\nModo Husky: ${modeloHuskyElegido}\nPega este texto en el chat.`,
       );
     })
     .catch(() => {

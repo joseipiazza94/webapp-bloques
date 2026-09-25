@@ -65,7 +65,6 @@ const SISTEMA = {
           texto: "Apagar LED en",
           campos: [{ tipo: "dinamico", fuente: "led" }],
         },
-        // Bloques de brillo con indicación visual PWM y fuente filtrada
         {
           texto: "Ajustar brillo de LED (PWM ~) en",
           campos: [{ tipo: "dinamico", fuente: "led-pwm" }],
@@ -87,7 +86,6 @@ const SISTEMA = {
         },
       ],
     },
-
     {
       categoria: "LEDs RGB",
       color: "#2E7D32",
@@ -111,7 +109,6 @@ const SISTEMA = {
       categoria: "Servomotores",
       color: "#FF5722",
       bloques: [
-        // 1. Ángulo fijo manual
         {
           texto: "Mover Servo en",
           campos: [{ tipo: "dinamico", fuente: "servo" }],
@@ -119,7 +116,6 @@ const SISTEMA = {
           campos2: [{ tipo: "input", val: "90" }],
           sufijo2: "grados",
         },
-        // 2. Control interactivo en tiempo real con Potenciómetro (COMBINADO)
         {
           texto: "Copiar giro: Mover Servo en",
           campos: [{ tipo: "dinamico", fuente: "servo" }],
@@ -128,7 +124,6 @@ const SISTEMA = {
         },
       ],
     },
-    ,
     {
       categoria: "Panel LCD 16x2 (I2C)",
       color: "#3F51B5",
@@ -191,7 +186,6 @@ const SISTEMA = {
         },
       ],
     },
-
     {
       categoria: "Potenciómetro (Perilla)",
       color: "#795548",
@@ -236,12 +230,9 @@ const SISTEMA = {
         },
       ],
     },
-    // ==========================================
-    // PULSADORES (BOTÓN MOMENTÁNEO)
-    // ==========================================
     {
       categoria: "Pulsadores (Botones)",
-      color: "#607D8B", // Gris azulado metálico
+      color: "#607D8B",
       bloques: [
         {
           texto: "Si Pulsador en",
@@ -261,15 +252,10 @@ const SISTEMA = {
         },
       ],
     },
-
-    // ==========================================
-    // INTERRUPTORES Y SELECTORES
-    // ==========================================
     {
       categoria: "Switches y Selectores",
-      color: "#455A64", // Gris comando oscuro
+      color: "#455A64",
       bloques: [
-        // Switch de 2 estados
         {
           texto: "Si Switch 2 Estados en",
           campos: [{ tipo: "dinamico", fuente: "switch" }],
@@ -278,7 +264,6 @@ const SISTEMA = {
             { tipo: "select", opts: ["ACTIVADO (ON)", "DESACTIVADO (OFF)"] },
           ],
         },
-        // Selector de 3 vías (Posición 1 / Centro / Posición 2)
         {
           texto: "Si Selector 3 Vías en",
           campos: [{ tipo: "dinamico", fuente: "selector3" }],
@@ -298,6 +283,9 @@ const SISTEMA = {
     },
   ],
 
+  // ==========================================
+  // BLOQUES DE PC / PYTHON MULTIMEDIA
+  // ==========================================
   pc: [
     {
       categoria: "Eventos de Escucha USB",
@@ -307,10 +295,6 @@ const SISTEMA = {
           texto: "Al recibir mensaje USB:",
           campos: [{ tipo: "input", val: "1" }],
         },
-        {
-          texto: "Al recibir mensaje USB de fin:",
-          campos: [{ tipo: "input", val: "0" }],
-        },
       ],
     },
     {
@@ -318,47 +302,21 @@ const SISTEMA = {
       color: "#9C27B0",
       bloques: [
         {
-          texto: "Proyectar holograma:",
-          campos: [{ tipo: "input", val: "flor_argentina.png" }],
+          texto: "Abrir imagen:",
+          campos: [{ tipo: "input", val: "vasija.png" }],
         },
-        { texto: "Apagar proyección holográfica" },
+        { texto: "Apagar imagen" },
       ],
     },
     {
-      categoria: "Audio y Música",
+      categoria: "Audio y Sonido",
       color: "#E91E63",
       bloques: [
         {
-          texto: "Tocar nota musical:",
-          campos: [
-            {
-              tipo: "select",
-              opts: [
-                "DO (C)",
-                "RE (D)",
-                "MI (E)",
-                "FA (F)",
-                "SOL (G)",
-                "LA (A)",
-                "SI (B)",
-              ],
-            },
-          ],
+          texto: "Reproducir sonido:",
+          campos: [{ tipo: "input", val: "relato_museo.mp3" }],
         },
-        {
-          texto: "Tocar efecto de sonido:",
-          campos: [
-            {
-              tipo: "select",
-              opts: [
-                "aplauso.wav",
-                "alarma.wav",
-                "fanfarria.wav",
-                "campana.wav",
-              ],
-            },
-          ],
-        },
+        { texto: "Detener sonido" },
       ],
     },
     {
@@ -367,7 +325,7 @@ const SISTEMA = {
       bloques: [
         {
           texto: "Reproducir video a pantalla completa:",
-          campos: [{ tipo: "input", val: "bandera_flameando.mp4" }],
+          campos: [{ tipo: "input", val: "intro.mp4" }],
         },
         { texto: "Detener video" },
       ],
@@ -377,8 +335,8 @@ const SISTEMA = {
       color: "#00BCD4",
       bloques: [
         {
-          texto: "Decir por voz sintetizada:",
-          campos: [{ tipo: "input", val: "Bandera detectada correctamente" }],
+          texto: "Hablar:",
+          campos: [{ tipo: "input", val: "Pieza arqueológica detectada" }],
         },
       ],
     },

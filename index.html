@@ -8,9 +8,95 @@
   <body>
     <header>
       <h1>Taller de Robótica • Algoritmos por Componentes</h1>
-      <button class="btn-copy" onclick="exportarLogica()">
-        📋 Copiar Resumen para el Asistente
-      </button>
+
+      <!-- CONTROLES GLOBALES DE SALIDA -->
+      <div
+        style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"
+      >
+        <!-- Selector Puerto COM -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 8px;
+            border-radius: 6px;
+          "
+        >
+          <label
+            for="sel-puerto-com"
+            style="font-weight: 600; font-size: 13px; color: #fff"
+            >Puerto:</label
+          >
+          <select
+            id="sel-puerto-com"
+            style="
+              padding: 3px 6px;
+              border-radius: 4px;
+              font-weight: bold;
+              border: 1px solid #ccc;
+              cursor: pointer;
+            "
+          >
+            <option value="COM1">COM1</option>
+            <option value="COM2">COM2</option>
+            <option value="COM3">COM3</option>
+            <option value="COM4">COM4</option>
+            <option value="COM5">COM5</option>
+            <option value="COM6">COM6</option>
+            <option value="COM7" selected>COM7</option>
+            <option value="COM8">COM8</option>
+            <option value="COM9">COM9</option>
+            <option value="COM10">COM10</option>
+          </select>
+        </div>
+
+        <!-- Selector Modelo HuskyLens 2 -->
+        <div
+          style="
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 4px 8px;
+            border-radius: 6px;
+          "
+        >
+          <label
+            for="sel-modelo-husky"
+            style="font-weight: 600; font-size: 13px; color: #fff"
+            >Modo Husky:</label
+          >
+          <select
+            id="sel-modelo-husky"
+            style="
+              padding: 3px 6px;
+              border-radius: 4px;
+              font-weight: bold;
+              border: 1px solid #ccc;
+              cursor: pointer;
+            "
+          >
+            <option value="ALGORITHM_SELF_LEARNING_CLASSIFICATION" selected>
+              Clasificador de Objetos
+            </option>
+            <option value="ALGORITHM_HAND_RECOGNITION">
+              Reconocimiento de Gestos / Manos
+            </option>
+            <option value="ALGORITHM_FACE_RECOGNITION">
+              Reconocimiento Facial
+            </option>
+            <option value="ALGORITHM_OBJECT_TRACKING">
+              Seguimiento de Objetos
+            </option>
+          </select>
+        </div>
+
+        <button class="btn-copy" onclick="exportarLogica()">
+          📋 Copiar Resumen para el Asistente
+        </button>
+      </div>
     </header>
 
     <!-- PANEL SUPERIOR: REGISTRO DINÁMICO DE HARDWARE -->
@@ -38,9 +124,7 @@
         <button class="btn-add-hw" onclick="agregarComponenteHardware()">
           + Conectar Componente
         </button>
-        <span class="hw-note"
-          >HuskyLens y LCD 16x2 van fijos a I2C (A4 / A5).</span
-        >
+        <span class="hw-note">HuskyLens va fija a I2C (A4 SDA / A5 SCL).</span>
       </div>
       <div class="hw-chips-list" id="hw-chips-list"></div>
     </div>
