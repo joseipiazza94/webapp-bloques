@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Taller Maker • Bloques por Componentes</title>
+    <link rel="stylesheet" href="estilos.css" />
+  </head>
+  <body>
+    <header>
+      <h1>Taller de Robótica • Algoritmos por Componentes</h1>
+      <button class="btn-copy" onclick="exportarLogica()">
+        📋 Copiar Resumen para el Asistente
+      </button>
+    </header>
+
+    <!-- PANEL SUPERIOR: REGISTRO DINÁMICO DE HARDWARE -->
+    <div class="hw-manager">
+      <div class="hw-manager-title">🔌 Componentes Conectados en la Mesa:</div>
+      <div class="hw-controls">
+        <select id="sel-tipo-comp">
+          <option value="led">LED Simple (Digital)</option>
+          <option value="servo">Servomotor (Digital)</option>
+          <option value="boton">Pulsador / Botón (1 Pin)</option>
+          <option value="switch">Switch 2 Estados (1 Pin)</option>
+          <option value="selector3">Selector 3 Posiciones (2 Pines)</option>
+          <option value="dht">DHT11 Temp/Hum (Digital)</option>
+          <option value="pot">Potenciómetro (Analógico)</option>
+          <option value="ldr">Sensor Luz LDR (Analógico)</option>
+          <option value="ultra">Sensor Ultrasónico HC-SR04 (Trig, Echo)</option>
+        </select>
+        <input
+          type="text"
+          id="inp-pin-comp"
+          placeholder="Pin (ej: 13, A0)"
+          value="13"
+          style="width: 100px"
+        />
+        <button class="btn-add-hw" onclick="agregarComponenteHardware()">
+          + Conectar Componente
+        </button>
+        <span class="hw-note"
+          >HuskyLens y LCD 16x2 van fijos a I2C (A4 / A5).</span
+        >
+      </div>
+      <div class="hw-chips-list" id="hw-chips-list"></div>
+    </div>
+
+    <div class="workspace">
+      <!-- PANEL ARDUINO -->
+      <div class="column">
+        <div class="col-header col-arduino">
+          <span>🤖 ARDUINO (Hardware y Sensores)</span>
+          <button class="btn-del" onclick="limpiar('board-arduino')">
+            Borrar Todo
+          </button>
+        </div>
+        <div class="toolbox" id="toolbox-arduino"></div>
+        <div class="board" id="board-arduino"></div>
+      </div>
+
+      <!-- PANEL NOTEBOOK -->
+      <div class="column">
+        <div class="col-header col-pc">
+          <span>💻 NOTEBOOK (Holograma y Multimedia)</span>
+          <button class="btn-del" onclick="limpiar('board-pc')">
+            Borrar Todo
+          </button>
+        </div>
+        <div class="toolbox" id="toolbox-pc"></div>
+        <div class="board" id="board-pc"></div>
+      </div>
+    </div>
+
+    <script src="catalogo.js"></script>
+    <script src="app.js"></script>
+  </body>
+</html>
