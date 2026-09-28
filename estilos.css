@@ -184,6 +184,9 @@ header h1 {
   z-index: 2;
   position: relative;
   border-left: 6px solid rgba(0, 0, 0, 0.3);
+  transition:
+    margin-left 0.15s ease,
+    border-left 0.15s ease;
 }
 
 .block-in-board:active {

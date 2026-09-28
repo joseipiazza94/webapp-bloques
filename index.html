@@ -4,6 +4,8 @@
     <meta charset="UTF-8" />
     <title>Taller Maker • Bloques por Componentes</title>
     <link rel="stylesheet" href="estilos.css" />
+    <!-- Librería para exportar tableros a imagen PNG -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </head>
   <body>
     <header>
@@ -27,8 +29,9 @@
           <label
             for="sel-puerto-com"
             style="font-weight: 600; font-size: 13px; color: #fff"
-            >Puerto:</label
           >
+            Puerto:
+          </label>
           <select
             id="sel-puerto-com"
             style="
@@ -66,8 +69,9 @@
           <label
             for="sel-modelo-husky"
             style="font-weight: 600; font-size: 13px; color: #fff"
-            >Modo Husky:</label
           >
+            Modo Husky:
+          </label>
           <select
             id="sel-modelo-husky"
             style="
@@ -104,9 +108,12 @@
       <div class="hw-manager-title">🔌 Componentes Conectados en la Mesa:</div>
       <div class="hw-controls">
         <select id="sel-tipo-comp">
+          <option value="buzzer">
+            Buzzer Pasivo / Zumbador (Digital / PWM)
+          </option>
+          <option value="boton">Pulsador / Botón (1 Pin)</option>
           <option value="led">LED Simple (Digital)</option>
           <option value="servo">Servomotor (Digital)</option>
-          <option value="boton">Pulsador / Botón (1 Pin)</option>
           <option value="switch">Switch 2 Estados (1 Pin)</option>
           <option value="selector3">Selector 3 Posiciones (2 Pines)</option>
           <option value="dht">DHT11 Temp/Hum (Digital)</option>
@@ -117,8 +124,8 @@
         <input
           type="text"
           id="inp-pin-comp"
-          placeholder="Pin (ej: 13, A0)"
-          value="13"
+          placeholder="Pin (ej: 8, 2, A0)"
+          value="8"
           style="width: 100px"
         />
         <button class="btn-add-hw" onclick="agregarComponenteHardware()">
@@ -129,26 +136,52 @@
       <div class="hw-chips-list" id="hw-chips-list"></div>
     </div>
 
+    <!-- ÁREA DE TRABAJO (COLUMNAS ARDUINO Y NOTEBOOK) -->
     <div class="workspace">
-      <!-- PANEL ARDUINO -->
+      <!-- COLUMNA ARDUINO -->
       <div class="column">
         <div class="col-header col-arduino">
           <span>🤖 ARDUINO (Hardware y Sensores)</span>
-          <button class="btn-del" onclick="limpiar('board-arduino')">
-            Borrar Todo
-          </button>
+          <div style="display: flex; gap: 6px">
+            <button
+              class="btn-copy"
+              style="padding: 3px 8px; font-size: 11px"
+              onclick="
+                exportarTableroComoImagen(
+                  'board-arduino',
+                  'algoritmo_arduino.png',
+                )
+              "
+            >
+              📷 Guardar PNG
+            </button>
+            <button class="btn-del" onclick="limpiar('board-arduino')">
+              Borrar Todo
+            </button>
+          </div>
         </div>
         <div class="toolbox" id="toolbox-arduino"></div>
         <div class="board" id="board-arduino"></div>
       </div>
 
-      <!-- PANEL NOTEBOOK -->
+      <!-- COLUMNA NOTEBOOK -->
       <div class="column">
         <div class="col-header col-pc">
           <span>💻 NOTEBOOK (Holograma y Multimedia)</span>
-          <button class="btn-del" onclick="limpiar('board-pc')">
-            Borrar Todo
-          </button>
+          <div style="display: flex; gap: 6px">
+            <button
+              class="btn-copy"
+              style="padding: 3px 8px; font-size: 11px"
+              onclick="
+                exportarTableroComoImagen('board-pc', 'algoritmo_notebook.png')
+              "
+            >
+              📷 Guardar PNG
+            </button>
+            <button class="btn-del" onclick="limpiar('board-pc')">
+              Borrar Todo
+            </button>
+          </div>
         </div>
         <div class="toolbox" id="toolbox-pc"></div>
         <div class="board" id="board-pc"></div>

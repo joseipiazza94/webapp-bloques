@@ -2,9 +2,11 @@
 // REGISTRO DE HARDWARE DINÁMICO
 // =========================================================================
 let componentesConectados = [
+  { tipo: "buzzer", pin: "8", etiqueta: "Buzzer Pasivo (Pin 8)" },
+  { tipo: "boton", pin: "2", etiqueta: "Pulsador (Pin 2)" },
   { tipo: "led", pin: "13", etiqueta: "LED Simple (Pin 13)" },
   { tipo: "servo", pin: "9", etiqueta: "Servo (Pin 9)" },
-  { tipo: "dht", pin: "2", etiqueta: "DHT11 (Pin 2)" },
+  { tipo: "dht", pin: "4", etiqueta: "DHT11 (Pin 4)" },
   { tipo: "pot", pin: "A0", etiqueta: "Potenciómetro (Pin A0)" },
   { tipo: "ldr", pin: "A1", etiqueta: "LDR Luz (Pin A1)" },
   { tipo: "ultra", pin: "7, 8", etiqueta: "Ultrasónico (Trig 7, Echo 8)" },
@@ -12,6 +14,7 @@ let componentesConectados = [
 
 function renderizarChipsHardware() {
   const cont = document.getElementById("hw-chips-list");
+  if (!cont) return;
   cont.innerHTML = "";
   componentesConectados.forEach((c, idx) => {
     const chip = document.createElement("div");
@@ -31,12 +34,13 @@ function agregarComponenteHardware() {
     .getElementById("inp-pin-comp")
     .value.trim()
     .toUpperCase();
-  if (!pin) return alert("Escribe un número de pin válido (ej: 13, A0)");
+  if (!pin) return alert("Escribe un número de pin válido (ej: 13, A0, 8)");
 
   const nombres = {
+    buzzer: "Buzzer Pasivo",
+    boton: "Pulsador",
     led: "LED Simple",
     servo: "Servomotor",
-    boton: "Pulsador",
     switch: "Switch 2 Estados",
     selector3: "Selector 3 Vías",
     dht: "DHT11",
@@ -45,10 +49,12 @@ function agregarComponenteHardware() {
     ultra: "Sensor Ultrasónico",
   };
 
+  const nombreEtiqueta = nombres[tipo] || "Componente";
+
   componentesConectados.push({
     tipo: tipo,
     pin: pin,
-    etiqueta: `${nombres[tipo]} (Pin ${pin})`,
+    etiqueta: `${nombreEtiqueta} (Pin ${pin})`,
   });
 
   renderizarChipsHardware();
@@ -77,7 +83,6 @@ function obtenerOpcionesHardware(tipo) {
   return filtrados.map((c) => `Pin ${c.pin}`);
 }
 
-// Si los chicos agregan o quitan componentes, se actualizan los desplegables del tablero
 function actualizarTodosLosSelectsDinamicos() {
   document.querySelectorAll(".select-dinamico").forEach((sel) => {
     const fuente = sel.getAttribute("data-fuente");
@@ -99,9 +104,13 @@ function actualizarTodosLosSelectsDinamicos() {
 
 function construirHerramientas(lado, idContenedor, idTablero) {
   const contenedor = document.getElementById(idContenedor);
+  if (!contenedor) return;
   contenedor.innerHTML = "";
 
-  if (!SISTEMA[lado]) return;
+  if (typeof SISTEMA === "undefined" || !SISTEMA[lado]) {
+    console.warn("No se encontró la definición de bloques para:", lado);
+    return;
+  }
 
   SISTEMA[lado].forEach((cat) => {
     const divCat = document.createElement("div");
@@ -143,12 +152,53 @@ function renderizarCampo(c) {
   return "";
 }
 
+function aplicarEstiloSangria(bloque, nivel) {
+  const pasoIndent = 26; // Desplazamiento por cada nivel de tabulación en px
+  bloque.setAttribute("data-indent", nivel);
+  bloque.style.boxSizing = "border-box";
+  bloque.style.marginLeft = `${nivel * pasoIndent}px`;
+  bloque.style.width = `calc(100% - ${nivel * pasoIndent}px)`;
+
+  if (nivel > 0) {
+    bloque.style.borderLeft = `${nivel * 4}px solid rgba(255, 255, 255, 0.7)`;
+  } else {
+    bloque.style.borderLeft = "";
+  }
+}
+
+function tabularBloque(boton, direccion) {
+  const bloque = boton.closest(".block-in-board");
+  if (!bloque) return;
+
+  let nivelActual = parseInt(bloque.getAttribute("data-indent") || "0", 10);
+  nivelActual = Math.max(0, Math.min(4, nivelActual + direccion)); // Límite de 0 a 4 niveles
+
+  aplicarEstiloSangria(bloque, nivelActual);
+}
+
 function agregarAlTablero(b, color, idTablero) {
   const tablero = document.getElementById(idTablero);
+  if (!tablero) return;
   const el = document.createElement("div");
   el.className = "block block-in-board";
   el.style.backgroundColor = color;
   el.draggable = true;
+
+  // Heredar automáticamente la indentación del último bloque del tablero si está anidado
+  let nivelInicial = 0;
+  const ultimoBloque = tablero.querySelector(".block-in-board:last-child");
+  if (ultimoBloque) {
+    const textoUltimo = ultimoBloque.innerText;
+    const indentUltimo = parseInt(
+      ultimoBloque.getAttribute("data-indent") || "0",
+      10,
+    );
+    if (textoUltimo.includes("Bucle (Repetir") || textoUltimo.includes("Si ")) {
+      nivelInicial = Math.min(4, indentUltimo + 1);
+    } else {
+      nivelInicial = indentUltimo;
+    }
+  }
 
   let html = `<div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap;">`;
   html += `<span class="step-number">#</span>`;
@@ -165,6 +215,8 @@ function agregarAlTablero(b, color, idTablero) {
 
   html += `
     <div class="controls-group">
+      <button class="btn-move" onclick="tabularBloque(this, -1)" title="Disminuir sangría">⇤</button>
+      <button class="btn-move" onclick="tabularBloque(this, 1)" title="Aumentar sangría">⇥</button>
       <button class="btn-move" onclick="moverBloque(this, -1)" title="Subir">▲</button>
       <button class="btn-move" onclick="moverBloque(this, 1)" title="Bajar">▼</button>
       <button class="btn-del" onclick="borrarBloque(this)" title="Quitar">✕</button>
@@ -174,6 +226,7 @@ function agregarAlTablero(b, color, idTablero) {
   el.innerHTML = html;
   tablero.appendChild(el);
 
+  aplicarEstiloSangria(el, nivelInicial);
   configurarArrastre(el, tablero);
   actualizarNumeros(tablero);
 }
@@ -197,32 +250,25 @@ function borrarBloque(boton) {
 }
 
 function limpiar(id) {
-  document.getElementById(id).innerHTML = "";
+  const el = document.getElementById(id);
+  if (el) el.innerHTML = "";
 }
 
 function actualizarNumeros(tablero) {
   const bloques = tablero.querySelectorAll(".block-in-board");
-  let dentroDeBucle = false;
-
   bloques.forEach((b, index) => {
     const pill = b.querySelector(".step-number");
     if (pill) pill.innerText = `#${index + 1}`;
 
     const texto = b.innerText;
-
     if (texto.includes("Bucle (Repetir")) {
       b.classList.add("loop-header");
-      b.classList.remove("inside-loop", "loop-footer");
-      dentroDeBucle = true;
+      b.classList.remove("loop-footer");
     } else if (texto.includes("Fin del bucle")) {
       b.classList.add("loop-footer");
-      b.classList.remove("inside-loop");
-      dentroDeBucle = false;
-    } else if (dentroDeBucle) {
-      b.classList.add("inside-loop");
-      b.classList.remove("loop-header", "loop-footer");
+      b.classList.remove("loop-header");
     } else {
-      b.classList.remove("inside-loop", "loop-header", "loop-footer");
+      b.classList.remove("loop-header", "loop-footer");
     }
   });
 }
@@ -245,8 +291,9 @@ function configurarArrastre(el, tablero) {
   });
   el.addEventListener("dragover", (e) => {
     e.preventDefault();
-    if (elementoArrastrado && elementoArrastrado !== el)
+    if (elementoArrastrado && elementoArrastrado !== el) {
       el.classList.add("drag-over");
+    }
   });
   el.addEventListener("dragleave", () => el.classList.remove("drag-over"));
   el.addEventListener("drop", (e) => {
@@ -265,7 +312,39 @@ function configurarArrastre(el, tablero) {
 }
 
 // =========================================================================
-// EXPORTADOR BLINDADO CON MAPA DE HARDWARE, COM Y HUSKYLENS V2
+// EXPORTADOR VISUAL DE TABLERO A IMAGEN PNG
+// =========================================================================
+function exportarTableroComoImagen(idTablero, nombreArchivo) {
+  const tablero = document.getElementById(idTablero);
+  if (!tablero || tablero.querySelectorAll(".block-in-board").length === 0) {
+    return alert("El tablero está vacío. Agrega bloques antes de exportar.");
+  }
+
+  // Ocultar controles durante la captura
+  const controles = tablero.querySelectorAll(".controls-group");
+  controles.forEach((c) => (c.style.display = "none"));
+
+  html2canvas(tablero, {
+    backgroundColor: "#ffffff",
+    scale: 2,
+    useCORS: true,
+  })
+    .then((canvas) => {
+      controles.forEach((c) => (c.style.display = ""));
+      const enlace = document.createElement("a");
+      enlace.download = nombreArchivo;
+      enlace.href = canvas.toDataURL("image/png");
+      enlace.click();
+    })
+    .catch((err) => {
+      controles.forEach((c) => (c.style.display = ""));
+      console.error("Error al capturar imagen:", err);
+      alert("No se pudo generar la imagen del tablero.");
+    });
+}
+
+// =========================================================================
+// EXPORTADOR DE TEXTO PARA ASISTENTE
 // =========================================================================
 function exportarLogica() {
   const puertoComElegido = document.getElementById("sel-puerto-com")
@@ -313,7 +392,6 @@ function exportarLogica() {
       return salida;
     }
 
-    let indentado = false;
     bloques.forEach((b, idx) => {
       const clon = b.cloneNode(true);
       const controles = clon.querySelector(".controls-group");
@@ -329,18 +407,13 @@ function exportarLogica() {
       clon.querySelectorAll(".val-input").forEach((el) => el.remove());
       let textoBase = clon.innerText.replace(/\s+/g, " ").trim();
 
-      if (textoBase.includes("Fin del bucle")) {
-        indentado = false;
-        salida += `Paso ${idx + 1}: ${textoBase}\n`;
-      } else if (indentado) {
-        salida += `   └── Paso ${idx + 1}: ${textoBase} ${valores.join(" ")}\n`;
-      } else {
-        salida += `Paso ${idx + 1}: ${textoBase} ${valores.join(" ")}\n`;
+      const nivelManual = parseInt(b.getAttribute("data-indent") || "0", 10);
+      let prefijo = "";
+      if (nivelManual > 0) {
+        prefijo = "   ".repeat(nivelManual) + "└── ";
       }
 
-      if (textoBase.includes("Bucle (Repetir")) {
-        indentado = true;
-      }
+      salida += `${prefijo}Paso ${idx + 1}: ${textoBase} ${valores.join(" ")}\n`;
     });
 
     return salida + "\n";
@@ -357,10 +430,13 @@ function exportarLogica() {
       );
     })
     .catch(() => {
-      prompt("Copia este texto manualmente:", prompt);
+      window.prompt("Copia este texto manualmente:", prompt);
     });
 }
 
+// =========================================================================
+// ARRANQUE AUTOMÁTICO AL CARGAR LA PÁGINA
+// =========================================================================
 window.onload = () => {
   renderizarChipsHardware();
   construirHerramientas("arduino", "toolbox-arduino", "board-arduino");

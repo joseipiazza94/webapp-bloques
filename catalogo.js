@@ -87,6 +87,35 @@ const SISTEMA = {
       ],
     },
     {
+      categoria: "Sonido y Alertas",
+      color: "#d35400",
+      bloques: [
+        {
+          texto: "Tocar nota en",
+          campos: [
+            { tipo: "dinamico", fuente: "buzzer" },
+            {
+              tipo: "select",
+              opts: [
+                "DO4 (262 Hz)",
+                "RE4 (294 Hz)",
+                "MI4 (330 Hz)",
+                "FA4 (349 Hz)",
+                "SOL4 (392 Hz)",
+                "LA4 (440 Hz)",
+                "SI4 (494 Hz)",
+                "DO5 (523 Hz)",
+              ],
+            },
+          ],
+        },
+        {
+          texto: "Silenciar",
+          campos: [{ tipo: "dinamico", fuente: "buzzer" }],
+        },
+      ],
+    },
+    {
       categoria: "LEDs RGB",
       color: "#2E7D32",
       bloques: [
@@ -305,7 +334,7 @@ const SISTEMA = {
           texto: "Abrir imagen:",
           campos: [{ tipo: "input", val: "vasija.png" }],
         },
-        { texto: "Apagar imagen" },
+        { texto: "Cerrar imagen" },
       ],
     },
     {
