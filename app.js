@@ -314,31 +314,75 @@ function configurarArrastre(el, tablero) {
 // =========================================================================
 // EXPORTADOR VISUAL DE TABLERO A IMAGEN PNG
 // =========================================================================
+// =========================================================================
+// EXPORTADOR VISUAL DE TABLERO A IMAGEN PNG (CAPTURA COMPLETA)
+// =========================================================================
 function exportarTableroComoImagen(idTablero, nombreArchivo) {
   const tablero = document.getElementById(idTablero);
   if (!tablero || tablero.querySelectorAll(".block-in-board").length === 0) {
     return alert("El tablero está vacío. Agrega bloques antes de exportar.");
   }
 
-  // Ocultar controles durante la captura
+  // 1. Quitar selección activa para que no salga el recuadro dashed
+  const seleccionadoPrevio =
+    typeof bloqueSeleccionado !== "undefined" ? bloqueSeleccionado : null;
+  if (typeof seleccionarBloque === "function") {
+    seleccionarBloque(null);
+  }
+
+  // 2. Ocultar los botones de acción (+, -, subir, bajar, borrar) en cada bloque
   const controles = tablero.querySelectorAll(".controls-group");
   controles.forEach((c) => (c.style.display = "none"));
 
+  // 3. Guardar estilos originales de scroll y altura para restaurarlos luego
+  const estiloPrevioOverflow = tablero.style.overflow;
+  const estiloPrevioHeight = tablero.style.height;
+  const estiloPrevioMaxHeight = tablero.style.maxHeight;
+
+  // 4. Forzar al tablero a desplegarse en su totalidad sin cortes de scroll
+  tablero.style.overflow = "visible";
+  tablero.style.height = "auto";
+  tablero.style.maxHeight = "none";
+
+  // Calcular dimensiones reales completas
+  const alturaTotal = tablero.scrollHeight;
+  const anchoTotal = tablero.scrollWidth;
+
   html2canvas(tablero, {
     backgroundColor: "#ffffff",
-    scale: 2,
+    scale: 2, // Alta resolución (Retina) para que el texto sea nítido
     useCORS: true,
+    height: alturaTotal, // Forzar la altura entera de los bloques
+    width: anchoTotal,
+    windowHeight: alturaTotal + 200,
+    scrollY: -window.scrollY, // Compensar la posición de scroll de la página
   })
     .then((canvas) => {
+      // 5. Restaurar estilos visuales del tablero
+      tablero.style.overflow = estiloPrevioOverflow;
+      tablero.style.height = estiloPrevioHeight;
+      tablero.style.maxHeight = estiloPrevioMaxHeight;
       controles.forEach((c) => (c.style.display = ""));
+      if (seleccionadoPrevio && typeof seleccionarBloque === "function") {
+        seleccionarBloque(seleccionadoPrevio);
+      }
+
+      // 6. Descargar el PNG completo
       const enlace = document.createElement("a");
       enlace.download = nombreArchivo;
       enlace.href = canvas.toDataURL("image/png");
       enlace.click();
     })
     .catch((err) => {
+      // Restauración en caso de error
+      tablero.style.overflow = estiloPrevioOverflow;
+      tablero.style.height = estiloPrevioHeight;
+      tablero.style.maxHeight = estiloPrevioMaxHeight;
       controles.forEach((c) => (c.style.display = ""));
-      console.error("Error al capturar imagen:", err);
+      if (seleccionadoPrevio && typeof seleccionarBloque === "function") {
+        seleccionarBloque(seleccionadoPrevio);
+      }
+      console.error("Error al capturar imagen completa:", err);
       alert("No se pudo generar la imagen del tablero.");
     });
 }
