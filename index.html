@@ -4,44 +4,43 @@
     <meta charset="UTF-8" />
     <title>Taller Maker • Bloques por Componentes</title>
     <link rel="stylesheet" href="estilos.css" />
-    <!-- Librería para exportar tableros a imagen PNG -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   </head>
   <body>
     <header>
-      <h1>Taller de Robótica • Algoritmos por Componentes</h1>
+      <!-- FILA 1: Título solo arriba -->
+      <div class="header-top">
+        <h1>🤖 Taller de Robótica • Algoritmos por Componentes</h1>
+        <div style="display: flex; gap: 8px">
+          <button
+            class="btn-copy"
+            style="background: #27ae60; color: #fff"
+            onclick="alternarDiagramaCircuito()"
+          >
+            🔌 Ver Circuito
+          </button>
+          <button
+            class="btn-copy"
+            style="background: #e67e22; color: #fff"
+            onclick="compilarConIA()"
+          >
+            ⚡ Compilar con IA
+          </button>
+          <button
+            class="btn-copy"
+            style="background: #2980b9; color: #fff"
+            onclick="exportarLogica()"
+          >
+            📋 Copiar Prompt con Contexto
+          </button>
+        </div>
+      </div>
 
-      <!-- CONTROLES GLOBALES DE SALIDA -->
-      <div
-        style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap"
-      >
-        <!-- Selector Puerto COM -->
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 8px;
-            border-radius: 6px;
-          "
-        >
-          <label
-            for="sel-puerto-com"
-            style="font-weight: 600; font-size: 13px; color: #fff"
-          >
-            Puerto:
-          </label>
-          <select
-            id="sel-puerto-com"
-            style="
-              padding: 3px 6px;
-              border-radius: 4px;
-              font-weight: bold;
-              border: 1px solid #ccc;
-              cursor: pointer;
-            "
-          >
+      <!-- FILA 2: Opciones de conexión y contexto del proyecto -->
+      <div class="header-controls-row">
+        <div class="header-group">
+          <label for="sel-puerto-com">Puerto COM:</label>
+          <select id="sel-puerto-com">
             <option value="COM1">COM1</option>
             <option value="COM2">COM2</option>
             <option value="COM3">COM3</option>
@@ -55,34 +54,13 @@
           </select>
         </div>
 
-        <!-- Selector Modelo HuskyLens 2 -->
-        <div
-          style="
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            background: rgba(255, 255, 255, 0.15);
-            padding: 4px 8px;
-            border-radius: 6px;
-          "
-        >
-          <label
-            for="sel-modelo-husky"
-            style="font-weight: 600; font-size: 13px; color: #fff"
-          >
-            Modo Husky:
-          </label>
-          <select
-            id="sel-modelo-husky"
-            style="
-              padding: 3px 6px;
-              border-radius: 4px;
-              font-weight: bold;
-              border: 1px solid #ccc;
-              cursor: pointer;
-            "
-          >
-            <option value="ALGORITHM_SELF_LEARNING_CLASSIFICATION" selected>
+        <div class="header-group">
+          <label for="sel-modelo-husky">Modo Husky:</label>
+          <select id="sel-modelo-husky">
+            <option value="ALGORITHM_TAG_RECOGNITION" selected>
+              Reconocimiento de Tags (AprilTags)
+            </option>
+            <option value="ALGORITHM_SELF_LEARNING_CLASSIFICATION">
               Clasificador de Objetos
             </option>
             <option value="ALGORITHM_HAND_RECOGNITION">
@@ -97,9 +75,15 @@
           </select>
         </div>
 
-        <button class="btn-copy" onclick="exportarLogica()">
-          📋 Copiar Resumen para el Asistente
-        </button>
+        <div class="header-group" style="flex: 1; min-width: 280px">
+          <label for="inp-contexto-ia">Contexto:</label>
+          <input
+            type="text"
+            id="inp-contexto-ia"
+            placeholder="Objetivo o descripción (ej: Museo interactivo, Invernadero, Banderas...)"
+            style="width: 100%"
+          />
+        </div>
       </div>
     </header>
 
@@ -120,6 +104,8 @@
           <option value="pot">Potenciómetro (Analógico)</option>
           <option value="ldr">Sensor Luz LDR (Analógico)</option>
           <option value="ultra">Sensor Ultrasónico HC-SR04 (Trig, Echo)</option>
+          <option value="huskylens">HuskyLens 2 (Cámara IA)</option>
+          <option value="lcd">Display LCD 16x2 I2C (0x27)</option>
         </select>
         <input
           type="text"
@@ -131,9 +117,66 @@
         <button class="btn-add-hw" onclick="agregarComponenteHardware()">
           + Conectar Componente
         </button>
-        <span class="hw-note">HuskyLens va fija a I2C (A4 SDA / A5 SCL).</span>
       </div>
       <div class="hw-chips-list" id="hw-chips-list"></div>
+    </div>
+
+    <!-- SECCIÓN DESPLEGABLE DEL DIAGRAMA ESQUEMÁTICO -->
+    <div
+      id="seccion-circuito"
+      style="
+        display: none;
+        margin: 15px 20px;
+        background: #181a20;
+        border: 1px solid #2d3139;
+        border-radius: 10px;
+        padding: 16px;
+      "
+    >
+      <div
+        style="
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          flex-wrap: wrap;
+          gap: 10px;
+        "
+      >
+        <div>
+          <h2 style="color: #fff; margin: 0; font-size: 18px">
+            🗺️ Esquema de Conexiones Físicas (Arduino Uno)
+          </h2>
+          <span style="color: #8a93a8; font-size: 13px">
+            Mapeo visual en alta resolución de pines y periféricos activos.
+          </span>
+        </div>
+        <div style="display: flex; gap: 8px">
+          <button
+            class="btn-copy"
+            style="background: #2980b9; color: #fff"
+            onclick="descargarDiagramaCircuito()"
+          >
+            💾 Descargar Esquema PNG
+          </button>
+          <button class="btn-del" onclick="alternarDiagramaCircuito()">
+            Cerrar
+          </button>
+        </div>
+      </div>
+      <div style="width: 100%; overflow-x: auto; text-align: center">
+        <canvas
+          id="canvas-circuito"
+          width="1200"
+          height="800"
+          style="
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+          "
+        ></canvas>
+      </div>
     </div>
 
     <!-- ÁREA DE TRABAJO (COLUMNAS ARDUINO Y NOTEBOOK) -->
@@ -145,7 +188,12 @@
           <div style="display: flex; gap: 6px">
             <button
               class="btn-copy"
-              style="padding: 3px 8px; font-size: 11px"
+              style="
+                padding: 3px 8px;
+                font-size: 11px;
+                background: rgba(0, 0, 0, 0.3);
+                color: #fff;
+              "
               onclick="
                 exportarTableroComoImagen(
                   'board-arduino',
@@ -171,7 +219,12 @@
           <div style="display: flex; gap: 6px">
             <button
               class="btn-copy"
-              style="padding: 3px 8px; font-size: 11px"
+              style="
+                padding: 3px 8px;
+                font-size: 11px;
+                background: rgba(0, 0, 0, 0.3);
+                color: #fff;
+              "
               onclick="
                 exportarTableroComoImagen('board-pc', 'algoritmo_notebook.png')
               "
@@ -187,6 +240,164 @@
         <div class="board" id="board-pc"></div>
       </div>
     </div>
+
+    <!-- MODAL DE VISUALIZACIÓN DE CÓDIGO GENERADO POR IA -->
+    <div
+      id="modal-codigo"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.85);
+        z-index: 9999;
+        justify-content: center;
+        align-items: center;
+      "
+    >
+      <div
+        style="
+          background: #1e1e24;
+          width: 90%;
+          max-width: 980px;
+          height: 85%;
+          border-radius: 12px;
+          display: flex;
+          flex-direction: column;
+          overflow: hidden;
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+          border: 1px solid #333745;
+        "
+      >
+        <div
+          style="
+            padding: 12px 20px;
+            background: #252836;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #3b3f54;
+            flex-wrap: wrap;
+            gap: 10px;
+          "
+        >
+          <div style="display: flex; gap: 10px; align-items: center">
+            <button
+              id="tab-btn-ino"
+              class="btn-copy"
+              style="background: #008184; color: #fff"
+              onclick="cambiarTabCodigo('ino')"
+            >
+              📄 Arduino (.ino)
+            </button>
+            <button
+              id="tab-btn-py"
+              class="btn-copy"
+              style="background: #3b3f54; color: #fff"
+              onclick="cambiarTabCodigo('py')"
+            >
+              🐍 Python (.py)
+            </button>
+          </div>
+          <div style="display: flex; gap: 8px">
+            <button
+              class="btn-copy"
+              style="background: #27ae60; color: #fff"
+              onclick="copiarCodigoActual()"
+            >
+              📋 Copiar
+            </button>
+            <button
+              class="btn-copy"
+              style="background: #2980b9; color: #fff"
+              onclick="descargarCodigoActual()"
+            >
+              💾 Descargar Archivo
+            </button>
+            <button class="btn-del" onclick="cerrarModalCodigo()">✕</button>
+          </div>
+        </div>
+
+        <div
+          style="
+            flex: 1;
+            padding: 16px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+          "
+        >
+          <textarea
+            id="txt-codigo-salida"
+            readonly
+            style="
+              width: 100%;
+              height: 100%;
+              background: #121318;
+              color: #a6e22e;
+              font-family:
+                &quot;Consolas&quot;, &quot;Courier New&quot;, monospace;
+              font-size: 13px;
+              line-height: 1.5;
+              padding: 14px;
+              border-radius: 8px;
+              border: 1px solid #2b2e3b;
+              resize: none;
+              outline: none;
+              box-sizing: border-box;
+            "
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- OVERLAY DE CARGA (SPINNER) -->
+    <div
+      id="overlay-cargando"
+      style="
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.75);
+        z-index: 10000;
+        justify-content: center;
+        align-items: center;
+        flex-direction: column;
+        color: #fff;
+      "
+    >
+      <div
+        style="
+          width: 50px;
+          height: 50px;
+          border: 5px solid #444;
+          border-top: 5px solid #e67e22;
+          border-radius: 50%;
+          animation: girarCarga 1s linear infinite;
+          margin-bottom: 16px;
+        "
+      ></div>
+      <h3 style="margin: 0; font-size: 18px">Compilando con Gemini AI...</h3>
+      <span style="color: #bbb; font-size: 13px; margin-top: 6px">
+        Generando sketch de Arduino y script de Python con control de estados
+      </span>
+    </div>
+
+    <style>
+      @keyframes girarCarga {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+    </style>
 
     <script src="catalogo.js"></script>
     <script src="app.js"></script>

@@ -324,6 +324,22 @@ const SISTEMA = {
           texto: "Al recibir mensaje USB:",
           campos: [{ tipo: "input", val: "1" }],
         },
+        {
+          texto: "Al recibir valor de:",
+          campos: [
+            {
+              tipo: "select",
+              opts: [
+                "Temperatura DHT11",
+                "Humedad DHT11",
+                "Distancia Ultrasónica",
+                "Nivel Luz LDR",
+                "Giro Potenciómetro",
+                "ID HuskyLens",
+              ],
+            },
+          ],
+        },
       ],
     },
     {
@@ -366,6 +382,29 @@ const SISTEMA = {
         {
           texto: "Hablar:",
           campos: [{ tipo: "input", val: "Pieza arqueológica detectada" }],
+        },
+      ],
+    },
+
+    {
+      categoria: "🔒 Protocolo Web & Alertas (Patrimonio)",
+      color: "#2c3e50",
+      secreta: true, // Oculto por defecto: se activa con 5 clics
+      bloques: [
+        {
+          texto: "Si valor del sensor:",
+          campos: [{ tipo: "select", opts: ["Temperatura", "Humedad", "Luz"] }],
+          sufijo: "está fuera del umbral seguro:",
+        },
+        {
+          texto: "✉️ Enviar correo de alerta ambiental preventiva",
+        },
+        {
+          texto: "🚨 Enviar correo de emergencia biológica",
+        },
+        {
+          texto: "🌐 Actualizar lecturas en Dashboard Web Flask",
+          campos: [{ tipo: "input", val: "http://localhost:5000" }],
         },
       ],
     },
