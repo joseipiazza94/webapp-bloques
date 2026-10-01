@@ -47,7 +47,23 @@ const SISTEMA = {
         {
           texto: "Si HuskyLens reconoce ID:",
           campos: [
-            { tipo: "select", opts: ["1", "2", "3", "4", "5", "6", "7", "8"] },
+            {
+              tipo: "select",
+              opts: [
+                "1",
+                "2",
+                "3",
+                "4",
+                "5",
+                "6",
+                "7",
+                "8",
+                "9",
+                "10",
+                "11",
+                "12",
+              ],
+            },
           ],
         },
         { texto: "Si HuskyLens no detecta nada" },
