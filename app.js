@@ -1554,7 +1554,7 @@ function descargarDiagramaCircuito() {
 // =========================================================================
 // INTEGRACIÓN CON GOOGLE GEMINI AI (CLAVE DIRECTA EN CÓDIGO)
 // =========================================================================
-const GEMINI_API_KEY = "AQ.Ab8RN6JOb3OrWR0FZ5zwaQtGk3f9L0GZtyG_Vemy5ib_a51kMw";
+const GEMINI_API_KEY = "";
 
 let codigoGeneradoIno = "";
 let codigoGeneradoPy = "";
